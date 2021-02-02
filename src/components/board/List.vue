@@ -20,9 +20,9 @@
 					<th>아이디</th>
 					<th>날짜</th>
 				</tr>
-				<tr v-for="(row, idx) in list" :key="idx">
-					<td>{{no-idx}}</td>
-					<td class="txt_left"><a href="javascript:;">{{row.subject}}</a></td>
+				<tr v-for="(row, idx) in list.recordset" :key="idx">
+					<td>{{row.num}}</td>
+					<td class="txt_left"><a href="javascript:;" @click="fnView(`${row.num}`)">{{row.subject}}</a></td>
 					<td>{{row.id}}</td>
 					<td>{{row.regdate}}</td>
 				</tr>
@@ -31,7 +31,7 @@
 				</tr>
 			</table>
 		</div>
-
+  
   <div class="pagination" v-if="paging.totalCount > 0">
 			<a href="javascript:;" @click="fnPage(1)" class="first">&lt;&lt;</a>
 			<a href="javascript:;" v-if="paging.start_page > 10" @click="fnPage(`${paging.start_page-1}`)"  class="prev">&lt;</a>
@@ -55,7 +55,7 @@
 
 <script>
 export default {
-   data() {
+    data() {
       return {
        body:'' //리스트 페이지 데이터전송
 			,board_code:'news' //게시판코드
@@ -87,6 +87,7 @@ export default {
 			this.$axios.get('http://localhost:3000/api/board',{params:this.body})
 			.then((res)=>{
 				if(res.data.success) {
+          console.log(res.data);
 					this.list = res.data.list;
 					this.paging = res.data.paging;
 					this.no = this.paging.totalCount - ((this.paging.page-1) * this.paging.ipp);
@@ -119,7 +120,11 @@ export default {
 				this.page = n;
 				this.fnGetList();
 			}
-		}
+    }
+    ,fnView(num) {
+      this.body.num = num;
+      this.$router.push({path:'./view',query:this.body}); // 추가한 상세페이지 라우터 
+    }
 	}
 }
 </script>

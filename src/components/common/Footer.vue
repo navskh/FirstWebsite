@@ -1,6 +1,6 @@
 <template>
 	<footer>
-		<p>copyRight fyzh99.tistory.com</p>
+		<h4>First webpage </h4>
 	</footer>
 </template>
 
