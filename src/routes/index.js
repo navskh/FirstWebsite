@@ -29,6 +29,5 @@ export default new Router({ //라우터 연결
       ,name:View
       ,component:View
     }
-		
 	]
 })

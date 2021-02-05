@@ -32,7 +32,8 @@
 export default {
 	data() { //변수 생성
 		return{
-			board_code:'news'
+      body:this.$route.query
+      ,board_code:'news'
 			,subject:''
 			,cont:''
 			,id:'admin'
@@ -47,11 +48,11 @@ export default {
 	}
 	,methods:{
     fnList(){ //리스트 화면으로 이동 함수
-      delete this.body.num;
-			this.$router.push({path:'./list',query:this.body});
+      // delete this.body.num;
+			this.$router.push({path:'./list',query:this.body.num});
     }
     ,fnGetView() {
-			this.$axios.get('http://localhost:3000/api/board/'+this.body.num,{params:this.body})
+			this.$axios.get('http://localhost:3000/api/board/'+this.num,{params:this.body})
 			.then((res)=>{
         this.view = res.data.view.recordset[0];
 				this.subject = this.view.subject;
@@ -62,7 +63,8 @@ export default {
 			})
     }
     ,fnView() {
-			this.$router.push({path:'./view',"query":this.body});
+      console.log(this);
+      this.$router.push({path:'./view', query:this.body});
 		}
 		,fnAddProc() { //등록 프로세스
 			if(!this.subject) { //제목이 없다면 값을 입력하라고 알려준다.
@@ -97,15 +99,13 @@ export default {
 				this.$refs.subject.focus(); //방식으로 선택자를 찾는다.
 				return;
 			}
-
 			this.form = {
 				board_code:this.board_code
 				,subject:this.subject
 				,cont:this.cont
 				,id:this.id
 				,num:this.num
-			} 
-			
+      } 
 			this.$axios.put('http://localhost:3000/api/board',this.form)
 			.then((res)=>{
 				if(res.data.success) {

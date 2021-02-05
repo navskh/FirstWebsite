@@ -18,10 +18,13 @@
 					<th>no</th>
 					<th>제목</th>
 					<th>아이디</th>
-					<th>날짜</th>
+					<th>날짜 
+            <a href="javascript:;" @click="fnAscend">▲</a>
+            <a href="javascript:;" @click="fnDescend">▼</a>
+            </th>
 				</tr>
 				<tr v-for="(row, idx) in list.recordset" :key="idx">
-					<td>{{row.num}}</td>
+					<td>{{row.i_num}}</td>
 					<td class="txt_left"><a href="javascript:;" @click="fnView(`${row.num}`)">{{row.subject}}</a></td>
 					<td>{{row.id}}</td>
 					<td>{{row.regdate}}</td>
@@ -48,7 +51,7 @@
 		</div>
 
 		<div class="btnRightWrap">
-			<a @click="fnAdd" class="btn">등록</a>
+			<a href="javascript:;" @click="fnAdd" class="btn">등록</a>
 		</div>
 	</div>
 </template>
@@ -82,12 +85,11 @@ export default {
 			this.body = { // 데이터 전송
 				board_code:this.board_code
 				,keyword:this.keyword
-				,page:this.page
-			}
+        ,page:this.page
+      }
 			this.$axios.get('http://localhost:3000/api/board',{params:this.body})
 			.then((res)=>{
 				if(res.data.success) {
-          console.log(res.data);
 					this.list = res.data.list;
 					this.paging = res.data.paging;
 					this.no = this.paging.totalCount - ((this.paging.page-1) * this.paging.ipp);
@@ -124,6 +126,17 @@ export default {
     ,fnView(num) {
       this.body.num = num;
       this.$router.push({path:'./view',query:this.body}); // 추가한 상세페이지 라우터 
+    }
+    ,fnAscend(){
+      this.body.updown = 1;
+      this.$axios.get("http://localhost:3000/api/board/",{params:this.body});
+      this.$router.push({path:'./list',query:this.body}); // 추가한 상세페이지 라우터 
+    }
+    ,fnDescend(){
+      this.body.updown = 2;
+      this.$axios.get("http://localhost:3000/api/board/",{params:this.body});
+      console.log(this.body);
+      this.$router.push({path:'./list',query:this.body}); // 추가한 상세페이지 라우터 
     }
 	}
 }

@@ -1,5 +1,8 @@
 const router = require('express').Router();
 const board = require('./board'); //board router 호출
+const dao = require('./board/dao'); //board router 호출
+
+router.post('/',dao.delete);
 
 router.all('*',(req, res, next)=>{
 	console.log("path="+req.path);

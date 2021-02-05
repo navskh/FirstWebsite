@@ -23,6 +23,7 @@
 		<div class="btnWrap">
 			<a href="javascript:;" @click="fnList" class="btn">목록</a>
       <a href="javascript:;" @click="fnMod" class="btnAdd btn">수정</a>
+      <a href="javascript:;" @click="fnDelete" class="btnDelete btn">삭제</a>
 		</div>	
 	</div>
 </template>
@@ -35,17 +36,17 @@ export default {
 			,subject:''
 			,cont:''
 			,view:''
-			,num:this.$route.query.num
+      ,num:this.$route.query.num
+      ,index:this.$route.query.index_num
 		}
 	}
 	,mounted() {
-		this.fnGetView();
+    if(this.num) this.fnGetView();
 	}
 	,methods:{
 		fnGetView() {
       this.$axios.get('http://localhost:3000/api/board/'+this.body.num,{params:this.body})
 			.then((res)=>{
-        console.log(res);
 				this.view = res.data.view.recordset[0];
 				this.subject = this.view.subject;
 				this.cont = this.view.cont.replace(/(\n)/g,'<br/>');
@@ -53,13 +54,22 @@ export default {
 			.catch((err)=>{
 				console.log(err);
 			})
-		}
-		,fnList(){
-			delete this.body.num;
-			this.$router.push({path:'./list',query:this.body});
     }
     ,fnMod(){
       this.$router.push({path:'./write',query:this.body}); // 등록화면으로 이동하면서 파라미터를 넘겨준다.
+    }
+		,fnList(){
+			//delete this.body.num;
+			this.$router.push({path:'./list'});
+    }
+    ,fnDelete(){
+      this.DeleteInform = {
+        num:this.num
+        ,index:this.index
+      }
+      console.log(this.DeleteInform);
+      this.$axios.post('http://localhost:3000/api',this.DeleteInform);
+      this.$router.push({path:'./list'});
     }
 	}
 }
