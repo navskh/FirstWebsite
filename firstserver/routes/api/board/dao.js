@@ -14,6 +14,7 @@ exports.list = async (req,res) => { //리스트 모듈 router에서 호출
 	let start_page = 1;
 	let end_page = block;
   let where = "";
+  let updown = "";
 
   let pool = await db.getPool("Board");
   let row = await pool.request()
@@ -46,17 +47,19 @@ exports.list = async (req,res) => { //리스트 모듈 router에서 호출
       ,"start_page" : start_page
       ,"end_page" : end_page
       ,"ipp" : ipp
+      ,"updown" : updown
     }
 
-    console.log(body);
+    paging.updown = body.updown;
+    console.log(paging.updown);
     if(body.updown === '2'){
-      start = totalCount-10*(page-1);
-      end = totalCount-(10*page)+1;
-      sql = "select * from (select ROW_NUMBER() over (order by regdate desc) as i_num,* from tb_board2) A where i_num >="
-      + start + "and i_num <= " + end;
+      start = totalCount-10*(page)+1;
+      end = totalCount-10*(page-1);
+      sql = "select * from (select ROW_NUMBER() over (order by regdate asc) as i_num,* from tb_board2) A where i_num >="
+      + start + "and i_num <= " + end + "order by i_num desc";
     }
     else{
-      sql = "select * from (select ROW_NUMBER() over (order by regdate desc) as i_num,* from tb_board2) A where i_num >="
+      sql = "select * from (select ROW_NUMBER() over (order by regdate) as i_num,* from tb_board2) A where i_num >="
       + start + "and i_num <= " + end;
     }
     

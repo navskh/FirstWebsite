@@ -19,16 +19,18 @@
 					<th>제목</th>
 					<th>아이디</th>
 					<th>날짜 
-            <a href="javascript:;" @click="fnAscend">▲</a>
-            <a href="javascript:;" @click="fnDescend">▼</a>
+            <a href="javascript:;" @click="fnAscend"><a href="javascript:;" @click="fnGetList(body.updown)">▲</a></a>
+            <a href="javascript:;" @click="fnDescend"><a href="javascript:;" @click="fnGetList(body.updown)">▼</a></a>
             </th>
 				</tr>
-				<tr v-for="(row, idx) in list.recordset" :key="idx">
-					<td>{{row.i_num}}</td>
-					<td class="txt_left"><a href="javascript:;" @click="fnView(`${row.num}`)">{{row.subject}}</a></td>
-					<td>{{row.id}}</td>
-					<td>{{row.regdate}}</td>
-				</tr>
+
+        <tr v-for="(row, idx) in list.recordset" :key="idx">
+        <td>{{row.i_num}}</td>
+        <td class="txt_left"><a href="javascript:;" @click="fnView(`${row.num}`)">{{row.subject}}</a></td>
+        <td>{{row.id}}</td>
+        <td>{{row.regdate}}</td>
+        </tr>
+
 				<tr v-if="list.length == 0">
 					<td colspan="4">데이터가 없습니다.</td>
 				</tr>
@@ -68,6 +70,7 @@ export default {
 			,start_page:'' //시작페이지
 			,page:this.$route.query.page ? this.$route.query.page:1
 			,keyword:this.$route.query.keyword
+      ,updown:this.$route.query.updown
 			,paginavigation:function() { //페이징 처리 for문 커스텀
 				var pageNumber = [];
 				var start_page = this.paging.start_page;
@@ -81,18 +84,20 @@ export default {
       this.fnGetList(); 
     }
   ,methods:{
-		fnGetList() { //데이터 가져오기 함수
+		fnGetList(updown) { //데이터 가져오기 함수
 			this.body = { // 데이터 전송
 				board_code:this.board_code
 				,keyword:this.keyword
         ,page:this.page
+        ,updown:this.updown
       }
-			this.$axios.get('http://localhost:3000/api/board',{params:this.body})
+			this.$axios.get('http://localhost:3000/api/board',{params:this.body}) 
 			.then((res)=>{
 				if(res.data.success) {
 					this.list = res.data.list;
 					this.paging = res.data.paging;
 					this.no = this.paging.totalCount - ((this.paging.page-1) * this.paging.ipp);
+          this.updown = updown;
 				} else {
 					alert("실행중 실패했습니다.\n다시 이용해 주세요.");
 				}
@@ -104,20 +109,11 @@ export default {
 		,fnAdd() {
 			this.$router.push("./write");
 		}
-		,getList() {
-			this.$axios.get("http://localhost:3000/api/board")
-			.then((res)=>{
-				console.log(res);
-			})
-			.then((err)=>{
-				console.log(err);
-			})
-		}
 		,fnSearch() { //검색
 			this.paging.page = 1;
 			this.fnGetList();
 		}
-		, fnPage(n) {//페이징 이
+		, fnPage(n) {
 			if(this.page != n) {
 				this.page = n;
 				this.fnGetList();
@@ -130,13 +126,14 @@ export default {
     ,fnAscend(){
       this.body.updown = 1;
       this.$axios.get("http://localhost:3000/api/board/",{params:this.body});
-      this.$router.push({path:'./list',query:this.body}); // 추가한 상세페이지 라우터 
+      // this.$router.push({path:'./list',query:this.body}); // 추가한 상세페이지 라우터 
+      // this.fnGetList();
     }
     ,fnDescend(){
       this.body.updown = 2;
       this.$axios.get("http://localhost:3000/api/board/",{params:this.body});
-      console.log(this.body);
-      this.$router.push({path:'./list',query:this.body}); // 추가한 상세페이지 라우터 
+      // this.$router.push({path:'./list',query:this.body}); // 추가한 상세페이지 라우터 
+      // this.fnGetList();
     }
 	}
 }

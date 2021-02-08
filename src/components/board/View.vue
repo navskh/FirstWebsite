@@ -38,6 +38,7 @@ export default {
 			,view:''
       ,num:this.$route.query.num
       ,index:this.$route.query.index_num
+      ,updown:this.$route.query.updown
 		}
 	}
 	,mounted() {
@@ -60,7 +61,7 @@ export default {
     }
 		,fnList(){
 			//delete this.body.num;
-			this.$router.push({path:'./list'});
+			this.$router.push({path:'./list',query:this.body});
     }
     ,fnDelete(){
       this.DeleteInform = {
