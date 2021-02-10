@@ -21,7 +21,7 @@
 		</div>
 
 		<div class="btnWrap">
-			<a href="javascript:;" @click="fnList" class="btn">목록</a>
+			<a href="javascript:;" @click="fnList()" class="btn">목록</a>
       <a href="javascript:;" @click="fnMod" class="btnAdd btn">수정</a>
       <a href="javascript:;" @click="fnDelete" class="btnDelete btn">삭제</a>
 		</div>	
@@ -60,9 +60,9 @@ export default {
       this.$router.push({path:'./write',query:this.body}); // 등록화면으로 이동하면서 파라미터를 넘겨준다.
     }
 		,fnList(){
-			//delete this.body.num;
-			this.$router.push({path:'./list',query:this.body});
+      this.$router.push({path:'./list',query:this.body});
     }
+    
     ,fnDelete(){
       this.DeleteInform = {
         num:this.num

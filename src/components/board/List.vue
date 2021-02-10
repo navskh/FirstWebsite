@@ -2,8 +2,14 @@
 	<div>
 		<h2>게시판 리스트</h2>
 
-    <div class="searchWrap">
-			<input type="text" v-model="keyword" @keyup.enter="fnSearch" /><a href="javascript:;" @click="fnSearch" class="btnSearch btn">검색</a>
+    <div class="searchWrap" >
+      <select v-model="view_mode" @change="fnSelectViewMode">
+        <option value="select_ten">10개씩 보이기</option>
+        <option value="select_thirty">30개씩 보이기</option>
+        <option value="select_fifty">50개씩 보이기</option>
+        <option value="select_hundred">100개씩 보이기</option>
+      </select>
+      <input type="text" v-model="keyword" @keyup.enter="fnSearch" /><a href="javascript:;" @click="fnSearch" class="btnSearch btn">검색</a>
 		</div>
 
     <div class="listWrap">
@@ -19,14 +25,14 @@
 					<th>제목</th>
 					<th>아이디</th>
 					<th>날짜 
-            <a href="javascript:;" @click="fnAscend"><a href="javascript:;" @click="fnGetList(body.updown)">▲</a></a>
-            <a href="javascript:;" @click="fnDescend"><a href="javascript:;" @click="fnGetList(body.updown)">▼</a></a>
+            <a href="javascript:;" @click="fnAscend"><a href="javascript:;" @click="fnGetList(paging.updown)">▲</a></a>
+            <a href="javascript:;" @click="fnDescend"><a href="javascript:;" @click="fnGetList(paging.updown)">▼</a></a>
             </th>
 				</tr>
 
         <tr v-for="(row, idx) in list.recordset" :key="idx">
         <td>{{row.i_num}}</td>
-        <td class="txt_left"><a href="javascript:;" @click="fnView(`${row.num}`)">{{row.subject}}</a></td>
+        <td class="txt_left"><a href="javascript:;" @click="fnView(`${row.num}`,`${paging.updown}`)">{{row.subject}}</a></td>
         <td>{{row.id}}</td>
         <td>{{row.regdate}}</td>
         </tr>
@@ -35,25 +41,24 @@
 					<td colspan="4">데이터가 없습니다.</td>
 				</tr>
 			</table>
-		</div>
-  
+		</div> 
   <div class="pagination" v-if="paging.totalCount > 0">
-			<a href="javascript:;" @click="fnPage(1)" class="first">&lt;&lt;</a>
-			<a href="javascript:;" v-if="paging.start_page > 10" @click="fnPage(`${paging.start_page-1}`)"  class="prev">&lt;</a>
+			<a href="javascript:;" @click="fnPage(1,`${paging.updown}`)" class="first">&lt;&lt;</a>
+			<a href="javascript:;" v-if="paging.end_page > 10" @click="fnPage(`${--paging.page}`,`${paging.updown}`)" class="prev">&lt;</a>
 			<template v-for=" (n,index) in paginavigation()">
 				<template v-if="paging.page==n">
-					<strong :key="index">{{n}}</strong>
+					<strong :key="index">{{n}}</strong> <!--현재 페이지 굵은 글씨로 출력-->
 				</template>
 				<template v-else>
-					<a href="javascript:;" @click="fnPage(`${n}`)" :key="index">{{n}}</a>
+					<a href="javascript:;" @click="fnPage(`${n}`,`${paging.updown}`)" :key="index">{{n}}</a> <!--현재 페이지 아닌 페이지 얇은 글씨로 출력-->
 				</template>
 			</template>
-			<a href="javascript:;" v-if="paging.total_page > paging.end_page" @click="fnPage(`${paging.end_page+1}`)"  class="next">&gt;</a>
-			<a href="javascript:;" @click="fnPage(`${paging.total_page}`)" class="last">&gt;&gt;</a>
+			<a href="javascript:;" v-if="paging.total_page > paging.end_page" @click="fnPage(`${++paging.page}`,`${paging.updown}`)" class="next">&gt;</a>
+			<a href="javascript:;" @click="fnPage(`${paging.total_page}`,`${paging.updown}`)" class="last">&gt;&gt;</a>
 		</div>
 
 		<div class="btnRightWrap">
-			<a href="javascript:;" @click="fnAdd" class="btn">등록</a>
+			<a href="javascript:;" @click="fnAdd(`${paging.updown}`)" class="btn">등록</a>
 		</div>
 	</div>
 </template>
@@ -71,17 +76,20 @@ export default {
 			,page:this.$route.query.page ? this.$route.query.page:1
 			,keyword:this.$route.query.keyword
       ,updown:this.$route.query.updown
+      ,view_mode:'select_ten'
 			,paginavigation:function() { //페이징 처리 for문 커스텀
 				var pageNumber = [];
 				var start_page = this.paging.start_page;
 				var end_page = this.paging.end_page;
 				for (var i = start_page; i <= end_page; i++) pageNumber.push(i);
+        console.log(start_page);
+        console.log(pageNumber);
 				return pageNumber;
         }
       }
     }
     ,mounted(){
-      this.fnGetList(); 
+      this.fnGetList(this.updown); 
     }
   ,methods:{
 		fnGetList(updown) { //데이터 가져오기 함수
@@ -89,7 +97,8 @@ export default {
 				board_code:this.board_code
 				,keyword:this.keyword
         ,page:this.page
-        ,updown:this.updown
+        ,updown:updown
+        ,view_mode:this.view_mode
       }
 			this.$axios.get('http://localhost:3000/api/board',{params:this.body}) 
 			.then((res)=>{
@@ -106,34 +115,36 @@ export default {
 				console.log(err);
 			})
 		}
-		,fnAdd() {
-			this.$router.push("./write");
+		,fnAdd(updown) {
+      this.body.updown = updown;
+			this.$router.push({path:'./write',query:this.body});
 		}
 		,fnSearch() { //검색
 			this.paging.page = 1;
-			this.fnGetList();
+			this.fnGetList(this.paging.updown);
 		}
-		, fnPage(n) {
+		,fnPage(n) {
 			if(this.page != n) {
 				this.page = n;
-				this.fnGetList();
+				this.fnGetList(this.paging.updown);
 			}
     }
-    ,fnView(num) {
+    ,fnView(num,updown) {
       this.body.num = num;
+      this.body.updown = updown;
       this.$router.push({path:'./view',query:this.body}); // 추가한 상세페이지 라우터 
     }
     ,fnAscend(){
       this.body.updown = 1;
       this.$axios.get("http://localhost:3000/api/board/",{params:this.body});
-      // this.$router.push({path:'./list',query:this.body}); // 추가한 상세페이지 라우터 
-      // this.fnGetList();
     }
     ,fnDescend(){
       this.body.updown = 2;
       this.$axios.get("http://localhost:3000/api/board/",{params:this.body});
-      // this.$router.push({path:'./list',query:this.body}); // 추가한 상세페이지 라우터 
-      // this.fnGetList();
+    }
+    ,fnSelectViewMode(){
+      this.body.view_mode=this.view_mode;
+      this.fnGetList(this.paging.updown);
     }
 	}
 }
@@ -141,12 +152,14 @@ export default {
 
 <style scoped>
   searchWrap{border:1px solid #888; border-radius:5px; text-align:center; padding:20px 0; margin-bottom:40px;}
-	.searchWrap input{width:60%; height:36px; border-radius:3px; padding:0 10px; border:1px solid #888;}
+	.searchWrap input{width:60%; height:30px; border-radius:3px; padding:0 10px; border:1px solid #888; margin:10px;}
 	.searchWrap .btnSearch{display:inline-block; margin-left:10px;}
 	.tbList th{border-top:1px solid #888;}
 	.tbList th, .tbList td{border-bottom:1px solid #eee; padding:5px 0;}
 	.tbList td.txt_left{text-align:left;}
 	.btnRightWrap{text-align:right; margin:10px 0 0 0;}
+
+  h2 {text-align : center; margin:10px; width:90%;}
 
 	.pagination{margin:20px 0 0 0; text-align:center;}
 	.first, .prev, .next, .last{border:1px solid #666; margin:0 5px;}

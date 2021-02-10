@@ -39,6 +39,7 @@ export default {
 			,id:'admin'
       ,form:'' //form 전송 데이터
       ,num:this.$route.query.num
+      ,updown:this.$route.query.updown
 		}
   }
   ,mounted() { //최초 로딩 시 실행
@@ -47,9 +48,9 @@ export default {
 		}
 	}
 	,methods:{
-    fnList(){ //리스트 화면으로 이동 함수
-      // delete this.body.num;
-			this.$router.push({path:'./list',query:this.body.num});
+    fnList(updown){ //리스트 화면으로 이동 함수
+      this.body.updown = updown;
+			this.$router.push({path:'./list',query:this.body});
     }
     ,fnGetView() {
 			this.$axios.get('http://localhost:3000/api/board/'+this.num,{params:this.body})
@@ -84,7 +85,7 @@ export default {
 			.then((res)=>{
 				if(res.data.success) {
 					alert('등록되었습니다.');
-					this.fnList();
+					this.fnList(2);
 				} else {
 					alert("실행중 실패했습니다.\n다시 이용해 주세요");
 				}

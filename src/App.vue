@@ -1,9 +1,9 @@
 <template>
   <div id="app">
     <!-- 추가된 헤더 컴포넌트 사용 -->
-    <Header />
+    <router-view name="header"/>
     <div class="container"> <!--class 추가-->
-    <router-view/>
+    <router-view></router-view>
     </div>
     <!-- 추가된 풋터 컴포넌트 사용 -->
     <Footer />
@@ -11,16 +11,16 @@
 </template>
 
 <script>
-import Header from './components/common/Header.vue'; //import 헤더 추가
+// import Header from './components/common/Header.vue'; //import 헤더 추가
 //import HelloWorld from './components/HelloWorld.vue'; 
 import Footer from './components/common/Footer.vue'; //import 풋터 추가
 
 export default {
   name: 'App',
   components: {
-    Header          //헤더 컴포넌트 추가
+    // Header          //헤더 컴포넌트 추가
     //, HelloWorld
-    ,Footer         //풋터 컴포넌트 추가
+    Footer         //풋터 컴포넌트 추가
     
   }
 }

@@ -14,32 +14,42 @@ exports.list = async (req,res) => { //리스트 모듈 router에서 호출
 	let start_page = 1;
 	let end_page = block;
   let where = "";
-  let updown = "";
 
   let pool = await db.getPool("Board");
   let row = await pool.request()
   .query("select * from tb_board2");
 
   body = req.query; // get
+  
+  console.log(req.query);
+  if(body.view_mode=="select_hundred"){
+    ipp = 100;
+    block = 100;
+  } else if(body.view_mode=="select_fifty"){
+    ipp = 50;
+    block = 50;
+  } else if(body.view_mode=="select_thirty"){
+    ipp = 30;
+    block = 30;
+  } else {
+    ipp = 10;
+    block = 10;
+  }
 
-  //console.log(req);
-
-  if(body.keyword) where += `AND subject like '%${body.keyword}%' `;
+  if(body.keyword) where = `AND subject like '%${body.keyword}%' `;
   var sql = `SELECT count(*) cnt FROM tb_board2 WHERE board_code = '` + body.board_code + `'${where}`;
   
   pool.query(sql,(err,data)=>{
     if(err) throw err;
-    totalCount = data.recordset[0].cnt; //21
-    total_page = Math.ceil(totalCount/ipp); // 2.1 --> 3
-
-    if(body.page) page = body.page; //3
-    start_page = Math.ceil(page/block); // 0.3 --> 1
-    end_page = start_page * block; // 10
-    start = (page-1)*10+1;//totalCount-10*(page-1);
-    end = page*10;//totalCount-(10*page)+1;
+    totalCount = data.recordset[0].cnt; 
     
-    if(total_page < end_page) end_page = total_page;
+    if(body.page) page = body.page;
+    total_page = Math.ceil(totalCount/ipp);
 
+    start_page = Math.ceil(page/10)*10 -9; 
+    end_page = Math.ceil(page/10)*10; 
+    if(total_page < end_page) end_page = total_page;
+    
     let paging = {
       "totalCount" : totalCount
       ,"total_page" : total_page
@@ -47,20 +57,22 @@ exports.list = async (req,res) => { //리스트 모듈 router에서 호출
       ,"start_page" : start_page
       ,"end_page" : end_page
       ,"ipp" : ipp
-      ,"updown" : updown
+      ,"updown" : ''
     }
-
+    
     paging.updown = body.updown;
-    console.log(paging.updown);
-    if(body.updown === '2'){
-      start = totalCount-10*(page)+1;
-      end = totalCount-10*(page-1);
-      sql = "select * from (select ROW_NUMBER() over (order by regdate asc) as i_num,* from tb_board2) A where i_num >="
-      + start + "and i_num <= " + end + "order by i_num desc";
+
+    if(body.updown === '1'){
+      start = (page-1)*ipp+1;//totalCount-10*(page-1);
+      end = page*ipp;//totalCount-(10*page)+1;
+      sql = "select * from (select ROW_NUMBER() over (order by regdate) as i_num,* from tb_board2 where board_code = '"+
+      body.board_code+`'${where})` + "A where i_num >=" + start + "and i_num <= " + end;
     }
-    else{
-      sql = "select * from (select ROW_NUMBER() over (order by regdate) as i_num,* from tb_board2) A where i_num >="
-      + start + "and i_num <= " + end;
+    else{  
+      start = totalCount-ipp*(page)+1;
+      end = totalCount-ipp*(page-1);
+      sql = "select * from (select ROW_NUMBER() over (order by regdate asc) as i_num,* from tb_board2 where board_code = '"+
+      body.board_code+`'${where})`+ "A where i_num >=" + start + "and i_num <= " + end + "order by i_num desc";
     }
     
 		pool.query(sql,(err,list)=> {
@@ -122,4 +134,19 @@ exports.delete = async(req,res) => {
     if(err) throw err;
     res.send({success:true});
   })
+}
+
+exports.user = async(req,res) => {
+  let pool = await db.getPool("Board");
+
+  params = req.body.params;
+
+  console.log(req.body.params);
+  var sql = " SELECT * FROM user_Info WHERE id = '"+ params.UserID +"'";
+
+  pool.query(sql,(err,user) => {
+    if(err) throw err;
+    res.send({success:true,user:user})
+  })
+
 }
