@@ -5,6 +5,7 @@
         <img alt="Vue logo" src="../../assets/panda.jpg" width="80">
       </router-link>
     </h1>
+    <h1 class="centerLogo">JINHAK</h1>
     <h4>
       <template v-if="LoginFlag==='true'">
         {{userName}}님 반갑습니다! 
@@ -19,14 +20,11 @@
 		<div class="menuWrap">
 			<ul class="menu">
 				<li>
-          <!-- <router-link to="/board/list">게시판</router-link> -->
-          <a href="javascript:;" @click="fnViewList">게시판</a>
+          <a href="javascript:;" @click="fnViewList">NEWS</a>
         </li>
-        <!--
 				<li><a href="javascript:;">메뉴2</a></li>
 				<li><a href="javascript:;">메뉴3</a></li>
 				<li><a href="javascript:;">메뉴4</a></li>
-        -->
 			</ul>
 		</div>
 	</header>
@@ -99,7 +97,7 @@ header h4{position:absolute; bottom:20%; left:190px;}
 header ul.menu:after{display:block; clear:both; content:'';}
 header ul.menu{position:absolute; top:20px; right:50px;}
 header ul.menu li{float:left; padding:10px 20px; list-style:none;}
-
+h1.centerLogo{position: relative; left:0px; color:rgb(10,43,110)}
 a{text-decoration:none; color:grey;}
 .btnWrap{position: relative; top:40px; padding-left: 60px;}
 .btnAdd {background:indigo; color: cornsilk;}
