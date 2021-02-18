@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h1>로그인!</h1>
+		<h1>로그인</h1>
     <div class="UserWrap" margin-top=100>
       <table>
         <tr>
@@ -43,7 +43,6 @@
         this.user={
           UserID:this.UserID
           ,PassWd:this.PassWd
-          ,LoginFlag:'false'
         }
         this.$axios.post('http://localhost:3000/api/board/'+this.UserID,{params:this.user})
         .then((res)=>{
@@ -51,9 +50,8 @@
 					this.user = res.data.user.recordset[0];
           if(this.PassWd === this.user.password){
             alert("로그인 성공!");
-            this.user.LoginFlag = 'true';
             this.$router.push({path:'../', user:this.user});
-            // this.$router.push({path:'./list',query:this.user});
+            this.$router.go();
           }
           else{
             alert("패스워드 정보가 일치하지 않습니다.");
@@ -67,7 +65,7 @@
 			})
       }
       ,fnUserAdd(){
-        
+        this.$router.push({path:'./userAdd'});
       }
     }
   }

@@ -2,6 +2,9 @@
 const { query } = require('express');
 const db = require('../../../config/db');
 
+var uID = '';
+var LoginFlag='false';
+
 exports.list = async (req,res) => { //리스트 모듈 router에서 호출
   // 일단은 변수 입력
   let ipp = 10;
@@ -21,7 +24,6 @@ exports.list = async (req,res) => { //리스트 모듈 router에서 호출
 
   body = req.query; // get
   
-  console.log(req.query);
   if(body.view_mode=="select_hundred"){
     ipp = 100;
     block = 100;
@@ -141,11 +143,46 @@ exports.user = async(req,res) => {
 
   params = req.body.params;
 
-  console.log(req.body.params);
   var sql = " SELECT * FROM user_Info WHERE id = '"+ params.UserID +"'";
 
   pool.query(sql,(err,user) => {
     if(err) throw err;
+
+    if(user.rowsAffected[0]) LoginFlag='true';
+    else LoginFlag='false';
+    // if(params.PassWd===user.recordset[0].password) LoginFlag='true';
+    // else LoginFlag='false';
+    console.log(LoginFlag);
+    if(LoginFlag=='true') uID = user.recordset[0].id;
+    res.send({success:true,user:user})
+  })
+
+}
+
+exports.header = async(req,res) => {
+  let pool = await db.getPool("Board");
+  var sql = " SELECT * FROM user_Info WHERE id = '"+ uID +"'";
+  
+  if(req.query.LoginFlag=='false') LoginFlag=false;
+    pool.query(sql,(err,user) => {
+    if(err) throw err;
+
+    user.LoginFlag=LoginFlag;
+    // console.log(user);
+    res.send({success:true,user:user})
+  })
+
+}
+
+exports.userAdd = async(req,res) => {
+  let pool = await db.getPool("Board");
+  params = req.body.params;
+  console.log("유저추가가 실행됨!");
+  var sql = " INSERT INTO user_Info(name,id,password) values('"+ params.userName +"','"+ params.userID +"','"+ params.password +"')";
+  
+  pool.query(sql,(err,user) => {
+    if(err) throw err;
+
     res.send({success:true,user:user})
   })
 

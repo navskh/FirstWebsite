@@ -19,12 +19,18 @@
 				</table>
 			</form>
 		</div>
-
-		<div class="btnWrap">
-			<a href="javascript:;" @click="fnList()" class="btn">목록</a>
-      <a href="javascript:;" @click="fnMod" class="btnAdd btn">수정</a>
-      <a href="javascript:;" @click="fnDelete" class="btnDelete btn">삭제</a>
-		</div>	
+    <template v-if="writerID===userID">
+      <div class="btnWrap">
+        <a href="javascript:;" @click="fnList()" class="btn">목록</a>
+        <a href="javascript:;" @click="fnMod" class="btnAdd btn">수정</a>
+        <a href="javascript:;" @click="fnDelete" class="btnDelete btn">삭제</a>
+      </div>
+    </template>
+    <template v-else>
+      <div class="btnWrap">
+        <a href="javascript:;" @click="fnList()" class="btn">목록</a>
+      </div>
+    </template>
 	</div>
 </template>
 
@@ -39,6 +45,9 @@ export default {
       ,num:this.$route.query.num
       ,index:this.$route.query.index_num
       ,updown:this.$route.query.updown
+      ,LoginFlag:this.$route.query.LoginFlag
+      ,userID:this.$route.query.userID
+      ,writerID:''
 		}
 	}
 	,mounted() {
@@ -51,6 +60,7 @@ export default {
 				this.view = res.data.view.recordset[0];
 				this.subject = this.view.subject;
 				this.cont = this.view.cont.replace(/(\n)/g,'<br/>');
+        this.writerID = this.view.id;
 			})
 			.catch((err)=>{
 				console.log(err);
@@ -60,6 +70,8 @@ export default {
       this.$router.push({path:'./write',query:this.body}); // 등록화면으로 이동하면서 파라미터를 넘겨준다.
     }
 		,fnList(){
+      this.body.LoginFlag = this.LoginFlag;
+      this.body.UserID = this.userID;
       this.$router.push({path:'./list',query:this.body});
     }
     

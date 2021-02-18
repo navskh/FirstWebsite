@@ -77,13 +77,13 @@ export default {
 			,keyword:this.$route.query.keyword
       ,updown:this.$route.query.updown
       ,view_mode:'select_ten'
+      ,LoginFlag:this.$route.query.LoginFlag
+      ,userID:this.$route.query.UserID
 			,paginavigation:function() { //페이징 처리 for문 커스텀
 				var pageNumber = [];
 				var start_page = this.paging.start_page;
 				var end_page = this.paging.end_page;
 				for (var i = start_page; i <= end_page; i++) pageNumber.push(i);
-        console.log(start_page);
-        console.log(pageNumber);
 				return pageNumber;
         }
       }
@@ -117,7 +117,11 @@ export default {
 		}
 		,fnAdd(updown) {
       this.body.updown = updown;
-			this.$router.push({path:'./write',query:this.body});
+      this.body.LoginFlag = this.LoginFlag;
+      this.body.userID = this.userID;
+      if(this.LoginFlag==='true')  this.$router.push({path:'./write',query:this.body});
+      else alert("로그인하셔야 작성이 가능합니다.")
+			
 		}
 		,fnSearch() { //검색
 			this.paging.page = 1;
@@ -132,6 +136,8 @@ export default {
     ,fnView(num,updown) {
       this.body.num = num;
       this.body.updown = updown;
+      this.body.LoginFlag = this.LoginFlag;
+      this.body.userID = this.userID;
       this.$router.push({path:'./view',query:this.body}); // 추가한 상세페이지 라우터 
     }
     ,fnAscend(){

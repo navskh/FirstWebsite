@@ -40,6 +40,8 @@ export default {
       ,form:'' //form 전송 데이터
       ,num:this.$route.query.num
       ,updown:this.$route.query.updown
+      ,LoginFlag:this.$route.query.LoginFlag
+      ,userID:this.$route.query.userID
 		}
   }
   ,mounted() { //최초 로딩 시 실행
@@ -50,6 +52,8 @@ export default {
 	,methods:{
     fnList(updown){ //리스트 화면으로 이동 함수
       this.body.updown = updown;
+      this.body.LoginFlag = this.LoginFlag;
+      this.body.UserID = this.userID;
 			this.$router.push({path:'./list',query:this.body});
     }
     ,fnGetView() {
@@ -78,7 +82,7 @@ export default {
 				board_code:this.board_code
 				,subject:this.subject
 				,cont:this.cont
-				,id:this.id
+				,id:this.userID
 			} 
 			
 			this.$axios.post('http://localhost:3000/api/board',this.form)
