@@ -4,7 +4,7 @@ const dao = require('./board/dao'); //board router 호출
 
 router.post('/',dao.delete);
 router.get('/',dao.header);
-router.put('/:num',dao.userAdd);
+router.put('/:num/:id',dao.userAdd);
 
 router.all('*',(req, res, next)=>{
 	console.log("path="+req.path);

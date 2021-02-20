@@ -19,7 +19,7 @@
 				</table>
 			</form>
 		</div>
-    <template v-if="writerID===userID">
+    <template v-if="writerID===userID || userID === 'admin'">
       <div class="btnWrap">
         <a href="javascript:;" @click="fnList()" class="btn">목록</a>
         <a href="javascript:;" @click="fnMod" class="btnAdd btn">수정</a>
@@ -80,9 +80,10 @@ export default {
         num:this.num
         ,index:this.index
       }
-      console.log(this.DeleteInform);
       this.$axios.post('http://localhost:3000/api',this.DeleteInform);
-      this.$router.push({path:'./list'});
+      this.body.LoginFlag = this.LoginFlag;
+      this.body.UserID = this.userID;
+      this.$router.push({path:'./list', query:this.body});
     }
 	}
 }

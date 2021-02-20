@@ -148,7 +148,10 @@ exports.user = async(req,res) => {
   pool.query(sql,(err,user) => {
     if(err) throw err;
 
-    if(user.rowsAffected[0]) LoginFlag='true';
+    if(user.rowsAffected[0]) {
+      if(params.PassWd == user.recordset[0].password) LoginFlag='true';
+      else LoginFlag='false';
+    }
     else LoginFlag='false';
     // if(params.PassWd===user.recordset[0].password) LoginFlag='true';
     // else LoginFlag='false';

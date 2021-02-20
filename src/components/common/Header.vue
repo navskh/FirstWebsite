@@ -56,11 +56,13 @@ export default {
       this.$axios.get('http://localhost:3000/api',{params:this.user})
       .then((res)=>{
 				if(res.data.success) {
-					this.user = res.data.user.recordset[0];
           this.LoginFlag=res.data.user.LoginFlag;
-          this.userName=this.user.name; 
-          this.UserID=this.user.id;
+          if(this.LoginFlag){
+            this.user = res.data.user.recordset[0];
+            this.userName=this.user.name; 
+            this.UserID=this.user.id;  
           }
+        }
 				else {
 					alert("실행중 실패했습니다.\n다시 이용해 주세요.");
 				}
